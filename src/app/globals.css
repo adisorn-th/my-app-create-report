@@ -19,3 +19,157 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+@font-face {
+  font-family: 'TH_Sarabun'; /* ชื่อ font family ที่คุณต้องการ */
+  src:
+      url('/fonts/Sarabun-Regular.woff2') format('woff2'),
+      url('/fonts/Sarabun-Regular.woff') format('woff'),
+      url('/fonts/Sarabun-Regular.ttf') format('truetype');
+  font-weight: normal; /* กำหนดน้ำหนักของ font */
+  font-style: normal; /* กำหนดรูปแบบของ font */
+  font-display: swap; /* ป้องกันปัญหา FOUT (Flash of Unstyled Text) */
+}
+
+/* --- 🔹 พื้นฐานของเนื้อหา --- */
+.preview-container {
+  font-family: "Sarabun", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+}
+
+/* --- 🔹 Headings --- */
+.preview-container h1,
+.preview-container h2,
+.preview-container h3,
+.preview-container h4,
+.preview-container h5,
+.preview-container h6 {
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+.preview-container h1 { font-size: 2em; }
+.preview-container h2 { font-size: 1.75em; }
+.preview-container h3 { font-size: 1.5em; }
+.preview-container h4 { font-size: 1.25em; }
+.preview-container h5 { font-size: 1.1em; }
+.preview-container h6 { font-size: 1em; }
+
+/* --- 🔹 Paragraph & Text --- */
+.preview-container p {
+  margin: 10px 0;
+}
+
+.preview-container strong {
+  font-weight: bold;
+}
+
+.preview-container em {
+  font-style: italic;
+}
+
+.preview-container u {
+  text-decoration: underline;
+}
+
+.preview-container del {
+  text-decoration: line-through;
+}
+
+/* --- 🔹 Lists (Bullet & Numbering) --- */
+.preview-container ul {
+  list-style-type: disc;
+  margin-left: 20px;
+  padding-left: 20px;
+}
+
+.preview-container ol {
+  list-style-type: decimal;
+  margin-left: 20px;
+  padding-left: 20px;
+}
+
+.preview-container ul ul {
+  list-style-type: circle;
+}
+
+.preview-container ul ul ul {
+  list-style-type: square;
+}
+
+/* --- 🔹 Blockquotes --- */
+.preview-container blockquote {
+  font-style: italic;
+  color: #555;
+  border-left: 4px solid #ccc;
+  margin: 10px 0;
+  padding-left: 10px;
+}
+
+/* --- 🔹 Code Blocks --- */
+.preview-container pre {
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: "Courier New", monospace;
+}
+
+.preview-container code {
+  background: #f0f0f0;
+  padding: 3px 5px;
+  border-radius: 3px;
+  font-family: "Courier New", monospace;
+}
+
+/* --- 🔹 Tables --- */
+.preview-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+.preview-container table th,
+.preview-container table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.preview-container table th {
+  background: #f2f2f2;
+  font-weight: bold;
+}
+
+/* --- 🔹 Links --- */
+.preview-container a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.preview-container a:hover {
+  text-decoration: underline;
+}
+
+/* --- 🔹 Images --- */
+.preview-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+/* --- 🔹 Alignment --- */
+.preview-container .align-left { text-align: left; }
+.preview-container .align-center { text-align: center; }
+.preview-container .align-right { text-align: right; }
+.preview-container .align-justify { text-align: justify; }
+
+/* --- 🔹 Spacing for Elements --- */
+.preview-container hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+
