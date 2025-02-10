@@ -10,7 +10,9 @@ import "jspdf-autotable";
 import { htmlToText } from "html-to-text";
 //import * as cheerio from "cheerio";
 //import { JSONToHTML } from "html-to-json-parser";
-import { HealthRecordsbyHNEN } from "@/api/health-records";
+import { HealthRecordsbyHNEN } from "@/app/api/health-records";
+import Swal from 'sweetalert2';
+import { CreatePost } from "@/app/api/main";
 
 const Editor = dynamic(() => import("@tinymce/tinymce-react").then((mod) => mod.Editor), { ssr: false });
 
@@ -32,7 +34,8 @@ const TemplateEditor: React.FC = () => {
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState(""); // ค่าที่ใช้ค้นหา
-
+    const [list, setlist] = useState({})
+    const [editorHtml, setEditorHtml] = useState({})
     // ฟังก์ชันดึงข้อมูลจาก API
     const fetchData = async () => {
         setLoading(true);
@@ -58,9 +61,18 @@ const TemplateEditor: React.FC = () => {
         }
     };
 
+    const onload = async () => {
+        // let res = await getDetailByid(router.query.id)
+        let res: any = []
+        console.log("res", res)
+        setlist(res.data)
+        setEditorHtml(res?.data?.dt_Project?.detail)
+    }
+
     // ใช้ useEffect อย่างถูกต้อง
     useEffect(() => {
         fetchData();
+        onload();
     }, []); // เรียก API เมื่อโหลดหน้า
 
     // ฟิลเตอร์ข้อมูลจากการค้นหา
@@ -255,13 +267,56 @@ const TemplateEditor: React.FC = () => {
         }
     };
 
+    const saveOn = async (content: any) => {
+        if (!content || content.trim() === "") {
+            Swal.fire("กรุณากรอกข้อมูลให้ครบ", "", "info");
+            return;
+        }
+
+        const data:any = {
+            name: 'Test',
+            content: content,
+            user_id: 4,
+            createdat: new Date()
+        };
+
+        const result = await Swal.fire({
+            title: "ต้องการแก้ไขข้อมูลใช่หรือไม่?",
+            showDenyButton: true,
+            confirmButtonText: "ยืนยัน",
+            denyButtonText: `ยกเลิก`
+        });
+
+        if (result.isConfirmed) {
+            try {
+                Swal.fire({
+                    title: "กำลังบันทึก...",
+                    didOpen: () => Swal.showLoading(),
+                    allowOutsideClick: false
+                });
+
+                const res = await CreatePost(data);
+
+                if (res?.success) {
+                    Swal.fire("บันทึกสำเร็จ!", "", "success");
+                } else {
+                    Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถบันทึกข้อมูลได้", "error");
+                }
+            } catch (error: any) {
+                Swal.fire("เกิดข้อผิดพลาด", error.message, "error");
+            }
+        } else if (result.isDenied) {
+            Swal.fire("ยกเลิกรายการสำเร็จ", "", "info");
+        }
+    };
+
+
     return (
         <div className="flex h-screen p-4">
             {/* Sidebar - Variables */}
             <div className="w-64 bg-gray-100 p-4">
 
-                <h1 className="text-xl font-bold">Health Records</h1>
-                {/* Textbox ค้นหา */}
+                {/* <h1 className="text-xl font-bold">Health Records</h1>
                 <div className="w-64 bg-gray-100 p-4 mt-4">
                     <h2 className="font-bold mb-4">Variables</h2>
                     <input
@@ -272,7 +327,6 @@ const TemplateEditor: React.FC = () => {
                         className="w-full p-2 mb-2 border rounded"
                     />
 
-                    {/* แสดงผลข้อมูลที่ผ่านการค้นหา */}
                     {filteredData.map((variable) => (
                         <div
                             key={variable.id}
@@ -283,7 +337,7 @@ const TemplateEditor: React.FC = () => {
                             {variable.label}
                         </div>
                     ))}
-                </div>
+                </div> */}
 
                 {/* <h2 className="font-bold mb-4">Variables</h2>
                 {data.map((variable) => (
@@ -306,8 +360,7 @@ const TemplateEditor: React.FC = () => {
                 </button>
             </div>
 
-            <div
-                className="flex-1 flex flex-col p-4"
+            <div className="flex-1 flex flex-col p-4 w-full"
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
             >
@@ -339,18 +392,19 @@ const TemplateEditor: React.FC = () => {
                 />
             </div>
 
+
             {/* Preview */}
-            <div className="w-1/3 bg-gray-50 p-4 overflow-auto">
+            {/* <div className="w-1/3 bg-gray-50 p-4 overflow-auto">
                 <h2 className="font-bold mb-4">Preview</h2>
-                {/* <div className="bg-white p-4 rounded" dangerouslySetInnerHTML={{ __html: content }} /> */}
                 <div className="preview-container" dangerouslySetInnerHTML={{ __html: content }} />
-                {/* <div
-                    className="bg-white p-4 rounded preview-container"
-                    style={{ fontFamily: "Sarabun, sans-serif", fontSize: "16px", lineHeight: "1.5" }}
-                    dangerouslySetInnerHTML={{ __html: content }}
-                /> */}
+            </div> */}
+            <div className="flex items-end justify-end p-6 rounded-b">
+                <button className="btn bg-green-500 mr-2 w-1/6" type="button" onClick={() => saveOn(content)}>
+                    บันทึก
+                </button>
             </div>
         </div >
+
     );
 };
 
