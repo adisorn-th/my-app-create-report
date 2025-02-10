@@ -1,8 +1,10 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import { type NextRequest } from 'next/server';
+//import { NextRequest, Response } from 'next/server';
 
 // 📌 CREATE (เพิ่มโพสต์ใหม่)
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const db = await open({
             filename: 'mydb.sqlite',
@@ -13,10 +15,11 @@ export async function POST(req: Request) {
         const { name, content, user_id } = body;
 
         if (!name || !content || !user_id) {
-            return new Response(JSON.stringify({ success: false, error: "All fields are required" }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            return Response.json({ success: false, error: "All fields are required" },
+                {
+                    status: 400,
+                    headers: { 'Content-Type': 'application/json' }
+                });
         }
 
         const createdAt = Date.now();
@@ -28,20 +31,21 @@ export async function POST(req: Request) {
 
         await db.close();
 
-        return new Response(JSON.stringify({ success: true, postId: result.lastID }), {
+        return  Response.json(({ success: true, postId: result.lastID }), {
             status: 201,
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (error) {
-        return new Response(JSON.stringify({ success: false, error: (error as Error).message }), {
+        return Response.json(({ success: false, error: (error as Error).message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
     }
 }
 
+
 // 📌 READ (ดึงข้อมูลโพสต์ทั้งหมด หรือโพสต์ตาม ID)
-export async function GET(req?: Request) {
+export async function GET(req: NextRequest) {
     try {
         const db = await open({
             filename: 'mydb.sqlite',
@@ -57,13 +61,13 @@ export async function GET(req?: Request) {
                 await db.close();
 
                 if (!post) {
-                    return new Response(JSON.stringify({ success: false, error: "Post not found" }), {
+                    return Response.json(({ success: false, error: "Post not found" }), {
                         status: 404,
                         headers: { 'Content-Type': 'application/json' }
                     });
                 }
 
-                return new Response(JSON.stringify({ success: true, post }), {
+                return Response.json(({ success: true, post }), {
                     status: 200,
                     headers: { 'Content-Type': 'application/json' }
                 });
@@ -73,13 +77,13 @@ export async function GET(req?: Request) {
         const posts = await db.all('SELECT * FROM posts');
         await db.close();
 
-        return new Response(JSON.stringify({ success: true, posts }), {
+        return Response.json(({ success: true, posts }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
 
     } catch (err: any) {
-        return new Response(JSON.stringify({ success: false, error: err.message }), {
+        return Response.json(({ success: false, error: err.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
@@ -87,7 +91,7 @@ export async function GET(req?: Request) {
 }
 
 // 📌 UPDATE (อัปเดตโพสต์)
-export async function PUT(req: Request) {
+export async function PUT(req: NextRequest) {
     try {
         const db = await open({
             filename: 'mydb.sqlite',
@@ -98,7 +102,7 @@ export async function PUT(req: Request) {
         const { id, name, content } = body;
 
         if (!id || !name || !content) {
-            return new Response(JSON.stringify({ success: false, error: "ID, name, and content are required" }), {
+            return Response.json(({ success: false, error: "ID, name, and content are required" }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -112,18 +116,18 @@ export async function PUT(req: Request) {
         await db.close();
 
         if (result.changes === 0) {
-            return new Response(JSON.stringify({ success: false, error: "Post not found or not updated" }), {
+            return Response.json(({ success: false, error: "Post not found or not updated" }), {
                 status: 404,
                 headers: { 'Content-Type': 'application/json' }
             });
         }
 
-        return new Response(JSON.stringify({ success: true, message: "Post updated successfully" }), {
+        return Response.json(({ success: true, message: "Post updated successfully" }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (error) {
-        return new Response(JSON.stringify({ success: false, error: (error as Error).message }), {
+        return Response.json(({ success: false, error: (error as Error).message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
@@ -131,7 +135,7 @@ export async function PUT(req: Request) {
 }
 
 // 📌 DELETE (ลบโพสต์)
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
     try {
         const db = await open({
             filename: 'mydb.sqlite',
@@ -142,7 +146,7 @@ export async function DELETE(req: Request) {
         const id = url.searchParams.get("id");
 
         if (!id) {
-            return new Response(JSON.stringify({ success: false, error: "ID is required" }), {
+            return Response.json(({ success: false, error: "ID is required" }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -152,18 +156,18 @@ export async function DELETE(req: Request) {
         await db.close();
 
         if (result.changes === 0) {
-            return new Response(JSON.stringify({ success: false, error: "Post not found" }), {
+            return Response.json(({ success: false, error: "Post not found" }), {
                 status: 404,
                 headers: { 'Content-Type': 'application/json' }
             });
         }
 
-        return new Response(JSON.stringify({ success: true, message: "Post deleted successfully" }), {
+        return Response.json(({ success: true, message: "Post deleted successfully" }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (error) {
-        return new Response(JSON.stringify({ success: false, error: (error as Error).message }), {
+        return Response.json(({ success: false, error: (error as Error).message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
