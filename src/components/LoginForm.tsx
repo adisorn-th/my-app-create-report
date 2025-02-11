@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-    const [email, setEmail] = useState("test@example.com");
-    const [password, setPassword] = useState("password");
+    const [username, setUsername] = useState("estyy123.th@gmail.com");
+    const [password, setPassword] = useState("abc123");
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -13,11 +13,12 @@ export default function LoginForm() {
         const res = await fetch("/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, password }),
         });
 
         const data = await res.json();
         if (data.success) {
+            localStorage.setItem('user', JSON.stringify({ users: data.users }))
             router.push("/");
         } else {
             alert("Login failed");
@@ -32,8 +33,8 @@ export default function LoginForm() {
                     type="email"
                     placeholder="อีเมล"
                     className="w-full p-2 mb-3 border border-gray-300 rounded"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
                 <input
                     type="password"

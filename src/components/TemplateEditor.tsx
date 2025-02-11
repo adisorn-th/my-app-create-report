@@ -13,6 +13,7 @@ import { htmlToText } from "html-to-text";
 import { HealthRecordsbyHNEN } from "@/app/api/health-records";
 import Swal from 'sweetalert2';
 import { CreatePost } from "@/app/api/main";
+import { useRouter } from "next/navigation";
 
 const Editor = dynamic(() => import("@tinymce/tinymce-react").then((mod) => mod.Editor), { ssr: false });
 
@@ -36,33 +37,43 @@ const TemplateEditor: React.FC = () => {
     const [search, setSearch] = useState(""); // ค่าที่ใช้ค้นหา
     const [list, setlist] = useState({})
     const [editorHtml, setEditorHtml] = useState({})
+    const router = useRouter();
     // ฟังก์ชันดึงข้อมูลจาก API
-    const fetchData = async () => {
-        setLoading(true);
+    // const fetchData = async () => {
+    //     setLoading(true);
 
-        try {
-            const response = await HealthRecordsbyHNEN({ hn, en });
-            const result = await response;
+    //     try {
+    //         const response = await HealthRecordsbyHNEN({ hn, en });
+    //         const result = await response;
 
-            const variables = result?.data
-                ? Object.keys(result.data).map((key) => ({
-                    id: key,
-                    label: key.replace(/_/g, " ").toUpperCase(),
-                    value: result.data[key] ?? "",
-                }))
-                : [];
+    //         const variables = result?.data
+    //             ? Object.keys(result.data).map((key) => ({
+    //                 id: key,
+    //                 label: key.replace(/_/g, " ").toUpperCase(),
+    //                 value: result.data[key] ?? "",
+    //             }))
+    //             : [];
 
-            console.log("Fetched Data:", variables);
-            setData(variables);
-        } catch (error) {
-            console.error("Error fetching health record:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         console.log("Fetched Data:", variables);
+    //         setData(variables);
+    //     } catch (error) {
+    //         console.error("Error fetching health record:", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const onload = async () => {
         // let res = await getDetailByid(router.query.id)
+
+        const storedKey = localStorage.getItem('user');
+        if (storedKey) {
+           // router.push('/patientinfo')
+        } else {
+            localStorage.removeItem('user');
+            router.push('/login')
+        }
+
         let res: any = []
         console.log("res", res)
         setlist(res.data)
@@ -71,7 +82,7 @@ const TemplateEditor: React.FC = () => {
 
     // ใช้ useEffect อย่างถูกต้อง
     useEffect(() => {
-        fetchData();
+        //fetchData();
         onload();
     }, []); // เรียก API เมื่อโหลดหน้า
 
@@ -273,7 +284,7 @@ const TemplateEditor: React.FC = () => {
             return;
         }
 
-        const data:any = {
+        const data: any = {
             name: 'Test',
             content: content,
             user_id: 4,

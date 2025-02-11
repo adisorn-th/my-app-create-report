@@ -1,6 +1,8 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import { NextRequest } from 'next/server';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 // GET: Fetch all users or a specific user by ID
 export async function GET(req: NextRequest) {
@@ -61,11 +63,12 @@ export async function POST(req: NextRequest) {
         const body = await req.json(); // Parse request body
 
         const result = await db.run(
-            'INSERT INTO user (first_name, last_name, email) VALUES (:first_name, :last_name, :email)',
+            'INSERT INTO user (first_name, last_name, email,password) VALUES (:first_name, :last_name, :email,:password)',
             {
                 ':first_name': body.first_name,
                 ':last_name': body.last_name,
-                ':email': body.email
+                ':email': body.email,
+                ':password': bcrypt.hashSync(body.password, 8)
             }
         );
 
@@ -166,3 +169,5 @@ export async function DELETE(req: NextRequest) {
         });
     }
 }
+
+
