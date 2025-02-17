@@ -8,8 +8,6 @@ import dynamic from "next/dynamic";
 import html2canvas from "html2canvas";
 import "jspdf-autotable";
 import { htmlToText } from "html-to-text";
-//import * as cheerio from "cheerio";
-//import { JSONToHTML } from "html-to-json-parser";
 import { HealthRecordsbyHNEN } from "@/app/api/health-records";
 import Swal from 'sweetalert2';
 import { CreatePost } from "@/app/api/main";
@@ -26,10 +24,27 @@ const Editor = dynamic(() => import("@tinymce/tinymce-react").then((mod) => mod.
 //     { id: "address", label: "Address", value: "{address}" },
 // ];
 
+interface Posts {
+    title?: string;
+    content?: string;
+    userId: Number;
+}
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    createdAt: string;
+    token: string;
+}
+
 const TemplateEditor: React.FC = () => {
     const editorRef = useRef<any>(null);
-    const [content, setContent] = useState<string>("");
-
+    const [posts, setPosts] = useState<Posts>({
+        title: '',
+        content: '',
+        userId: 0
+    });
+    const [content, setContent] = useState(null);//useState<string>("");
     const [hn] = useState("52-23-017636"); // กำหนดค่าเริ่มต้น
     const [en] = useState("O24149002");
     const [data, setData] = useState<any[]>([]);
@@ -37,6 +52,7 @@ const TemplateEditor: React.FC = () => {
     const [search, setSearch] = useState(""); // ค่าที่ใช้ค้นหา
     const [list, setlist] = useState({})
     const [editorHtml, setEditorHtml] = useState({})
+    const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
     // ฟังก์ชันดึงข้อมูลจาก API
     // const fetchData = async () => {
@@ -64,15 +80,22 @@ const TemplateEditor: React.FC = () => {
     // };
 
     const onload = async () => {
-        // let res = await getDetailByid(router.query.id)
+        // // let res = await getDetailByid(router.query.id)
+        //
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
 
-        const storedKey = localStorage.getItem('user');
-        if (storedKey) {
-           // router.push('/patientinfo')
-        } else {
-            localStorage.removeItem('user');
-            router.push('/login')
+            const parsedUser = JSON.parse(storedUser);
+            if (parsedUser.users) {
+                setUser(parsedUser.users);
+            }
         }
+        // if (storedKey) {
+        //     // router.push('/patientinfo')
+        // } else {
+        //     localStorage.removeItem('user');
+        //     router.push('/login')
+        // }
 
         let res: any = []
         console.log("res", res)
@@ -92,8 +115,8 @@ const TemplateEditor: React.FC = () => {
     );
 
     // เมื่อมีการเปลี่ยนแปลงใน Editor
-    const handleEditorChange = (content: string) => {
-        setContent(content);
+    const handleEditorChange = (content1: string) => {
+        setPosts(prevPosts => ({ ...prevPosts, content: content1 }));
     };
 
     // ลากตัวแปรไปใส่ใน Editor
@@ -213,55 +236,55 @@ const TemplateEditor: React.FC = () => {
     //     });
     // };
     const exportToWord = () => {
-        const textContent = htmlToText(content, {
-            wordwrap: 130,
-            preserveNewlines: true,
-        });
-        const doc = new Document({
-            sections: [
-                {
-                    properties: {},
-                    children: textContent.split("\n").map((line: any) =>
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: line,
-                                    font: "TH Sarabun New", // 📌 กำหนดฟอนต์ภาษาไทย
-                                    size: 32, // ขนาดฟอนต์ (16 = 8pt, 32 = 16pt)
-                                    bold: false, // ตัวหนา
-                                    italics: false, // ตัวเอียง
-                                }),
-                            ],
-                        })
-                    ),
-                },
-            ],
-        });
+        // const textContent = htmlToText(content, {
+        //     wordwrap: 130,
+        //     preserveNewlines: true,
+        // });
+        // const doc = new Document({
+        //     sections: [
+        //         {
+        //             properties: {},
+        //             children: textContent.split("\n").map((line: any) =>
+        //                 new Paragraph({
+        //                     children: [
+        //                         new TextRun({
+        //                             text: line,
+        //                             font: "TH Sarabun New", // 📌 กำหนดฟอนต์ภาษาไทย
+        //                             size: 32, // ขนาดฟอนต์ (16 = 8pt, 32 = 16pt)
+        //                             bold: false, // ตัวหนา
+        //                             italics: false, // ตัวเอียง
+        //                         }),
+        //                     ],
+        //                 })
+        //             ),
+        //         },
+        //     ],
+        // });
 
-        Packer.toBlob(doc).then((blob) => {
-            saveAs(blob, "Template.docx");
-        });
+        // Packer.toBlob(doc).then((blob) => {
+        //     saveAs(blob, "Template.docx");
+        // });
     };
 
     const exportToPDF = async () => {
-        const doc = new jsPDF({
-            orientation: "portrait",
-            unit: "mm",
-            format: "a4",
-        });
+        // const doc = new jsPDF({
+        //     orientation: "portrait",
+        //     unit: "mm",
+        //     format: "a4",
+        // });
 
-        const contentElement = document.createElement("div");
-        contentElement.innerHTML = content;
-        contentElement.style.fontFamily = "TH Sarabun, sans-serif";
-        contentElement.style.fontSize = "24px";
+        // const contentElement = document.createElement("div");
+        // contentElement.innerHTML = posts?.content;
+        // contentElement.style.fontFamily = "TH Sarabun, sans-serif";
+        // contentElement.style.fontSize = "24px";
 
-        document.body.appendChild(contentElement);
-        const canvas = await html2canvas(contentElement);
-        document.body.removeChild(contentElement);
+        // document.body.appendChild(contentElement);
+        // const canvas = await html2canvas(contentElement);
+        // document.body.removeChild(contentElement);
 
-        const imgData = canvas.toDataURL("image/png");
-        doc.addImage(imgData, "PNG", 10, 10, 190, 0);
-        doc.save("document.pdf");
+        // const imgData = canvas.toDataURL("image/png");
+        // doc.addImage(imgData, "PNG", 10, 10, 190, 0);
+        // doc.save("document.pdf");
     };
 
     // ฟังก์ชันอ่านไฟล์ `.docx` แล้วแปลงเป็น HTML
@@ -272,25 +295,39 @@ const TemplateEditor: React.FC = () => {
             reader.onload = async (e) => {
                 const arrayBuffer = e.target?.result as ArrayBuffer;
                 const result = await mammoth.convertToHtml({ arrayBuffer });
-                setContent(result.value); // แสดงผลใน Editor
+                setPosts(prevPosts => ({ ...prevPosts, content: result.value }));
             };
             reader.readAsArrayBuffer(file);
         }
     };
+    // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = event.target.files?.[0];
+    //     if (file) {
+    //         const reader = new FileReader();
+    //         reader.onload = async (e) => {
+    //             const arrayBuffer = e.target?.result as ArrayBuffer;
+    //             const result = await mammoth.convertToHtml({ arrayBuffer });
+    //             setPosts({content: result.value }); // แสดงผลใน Editor
+    //         };
+    //         reader.readAsArrayBuffer(file);
+    //     }
+    // };
 
-    const saveOn = async (content: any) => {
-        if (!content || content.trim() === "") {
+    const saveOn = async () => {
+        
+        if (!posts || posts.content === "") {
             Swal.fire("กรุณากรอกข้อมูลให้ครบ", "", "info");
             return;
         }
 
         const data: any = {
-            name: 'Test',
-            content: content,
-            user_id: 4,
-            createdat: new Date()
+            title: posts.title,
+            content: posts.content,
+            userId: user?.id
+            // user_id: 4,
+            // createdat: new Date()
         };
-
+        console.log("data", data)
         const result = await Swal.fire({
             title: "ต้องการแก้ไขข้อมูลใช่หรือไม่?",
             showDenyButton: true,
@@ -323,11 +360,13 @@ const TemplateEditor: React.FC = () => {
 
 
     return (
-        <div className="flex h-screen p-4">
-            {/* Sidebar - Variables */}
-            <div className="w-64 bg-gray-100 p-4">
+        <>
+            <div className="flex h-screen p-4">
 
-                {/* <h1 className="text-xl font-bold">Health Records</h1>
+                {/* Sidebar - Variables */}
+                <div className="w-64 bg-gray-100 p-4">
+
+                    {/* <h1 className="text-xl font-bold">Health Records</h1>
                 <div className="w-64 bg-gray-100 p-4 mt-4">
                     <h2 className="font-bold mb-4">Variables</h2>
                     <input
@@ -350,7 +389,7 @@ const TemplateEditor: React.FC = () => {
                     ))}
                 </div> */}
 
-                {/* <h2 className="font-bold mb-4">Variables</h2>
+                    {/* <h2 className="font-bold mb-4">Variables</h2>
                 {data.map((variable) => (
                     <div
                         key={variable.id}
@@ -361,61 +400,68 @@ const TemplateEditor: React.FC = () => {
                         {variable.label}
                     </div>
                 ))} */}
-                {/* ปุ่มอัปโหลดไฟล์ */}
-                <input type="file" accept=".docx" onChange={handleFileUpload} className="mb-2" />
-                <button onClick={exportToWord} className="bg-blue-500 text-white p-2 rounded mt-4 w-full">
-                    Export to Word
-                </button>
-                <button onClick={exportToPDF} className="bg-green-500 text-white p-2 rounded mt-4 w-full">
-                    Export to PDF
-                </button>
-            </div>
+                    {/* ปุ่มอัปโหลดไฟล์ */}
+                    <input type="file" accept=".docx" onChange={handleFileUpload} className="mb-2" />
+                    <button onClick={exportToWord} className="bg-blue-500 text-white p-2 rounded mt-4 w-full">
+                        Export to Word
+                    </button>
+                    <button onClick={exportToPDF} className="bg-green-500 text-white p-2 rounded mt-4 w-full">
+                        Export to PDF
+                    </button>
+                </div>
 
-            <div className="flex-1 flex flex-col p-4 w-full"
-                onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
-            >
-                <Editor
-                    apiKey="h9a0m7tta88e3l9u3s68t4zvqcs5yz69wrl9umkrkbh2hba6"
-                    onInit={(evt, editor) => (editorRef.current = editor)}
-                    value={content}
-                    onEditorChange={handleEditorChange}
-                    init={{
-                        height: 500,
-                        menubar: true,
-                        font_formats:
-                            "TH Sarabun=TH Sarabun, sans-serif; Arial=Arial, Helvetica, sans-serif; " +
-                            "Tahoma=Tahoma, Geneva, sans-serif; Verdana=Verdana, Geneva, sans-serif; " +
-                            "Courier New=Courier New, Courier, monospace; Times New Roman=Times New Roman, Times, serif;",
-                        toolbar:
-                            "fontselect fontsizeselect | bold italic underline strikethrough | " +
-                            "forecolor backcolor | alignleft aligncenter alignright alignjustify | " +
-                            "bullist numlist outdent indent | link image media table | charmap emoticons | " +
-                            "fullscreen preview | code help",
-                        plugins: [
-                            "advlist", "autolink", "lists", "link", "image", "charmap", "preview",
-                            "anchor", "searchreplace", "visualblocks", "code", "fullscreen",
-                            "insertdatetime", "media", "table", "help", "wordcount"
-                        ],
-                        content_style: 'body { font-family: "Sarabun", sans-serif; }',
-                        font_family_formats: "Sarabun=Sarabun, sans-serif;Andale Mono=Andale Mono, monospace;Arial=Arial, Helvetica, sans-serif;Arial Black=Arial Black, Gadget, sans-serif;Book Antiqua=Book Antiqua, Palatino, serif;Comic Sans MS=Comic Sans MS, cursive, sans-serif;Courier New=Courier New, monospace;Georgia=Georgia, Palatino, serif;Helvetica=Helvetica, Arial, sans-serif;Impact=Impact, Charcoal, sans-serif;Symbol=Symbol;Tahoma=Tahoma, Arial, sans-serif;Terminal=Terminal, Monaco, monospace;Times New Roman=Times New Roman, Times, serif;Trebuchet MS=Trebuchet MS, Helvetica, sans-serif;Verdana=Verdana, Geneva, sans-serif;Webdings=Webdings;Wingdings=Wingdings, Zapf Dingbats"
-                    }}
-                />
-            </div>
+                <div className="flex-1 flex flex-col p-4 w-full"
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                >
+                    <input
+                        type="title"
+                        placeholder="title"
+                        className="w-full p-2 mb-3 border border-gray-300 rounded"
+                        value={posts?.title}
+                        onChange={(e) => setPosts(prevPosts => ({ ...prevPosts, title: e.target.value }))}
+                    />
+                    <Editor
+                        apiKey="h9a0m7tta88e3l9u3s68t4zvqcs5yz69wrl9umkrkbh2hba6"
+                        onInit={(evt, editor) => (editorRef.current = editor)}
+                        value={posts?.content}
+                        onEditorChange={handleEditorChange}
+                        init={{
+                            height: 500,
+                            menubar: true,
+                            font_formats:
+                                "TH Sarabun=TH Sarabun, sans-serif; Arial=Arial, Helvetica, sans-serif; " +
+                                "Tahoma=Tahoma, Geneva, sans-serif; Verdana=Verdana, Geneva, sans-serif; " +
+                                "Courier New=Courier New, Courier, monospace; Times New Roman=Times New Roman, Times, serif;",
+                            toolbar:
+                                "fontselect fontsizeselect | bold italic underline strikethrough | " +
+                                "forecolor backcolor | alignleft aligncenter alignright alignjustify | " +
+                                "bullist numlist outdent indent | link image media table | charmap emoticons | " +
+                                "fullscreen preview | code help",
+                            plugins: [
+                                "advlist", "autolink", "lists", "link", "image", "charmap", "preview",
+                                "anchor", "searchreplace", "visualblocks", "code", "fullscreen",
+                                "insertdatetime", "media", "table", "help", "wordcount"
+                            ],
+                            content_style: 'body { font-family: "Sarabun", sans-serif; }',
+                            font_family_formats: "Sarabun=Sarabun, sans-serif;Andale Mono=Andale Mono, monospace;Arial=Arial, Helvetica, sans-serif;Arial Black=Arial Black, Gadget, sans-serif;Book Antiqua=Book Antiqua, Palatino, serif;Comic Sans MS=Comic Sans MS, cursive, sans-serif;Courier New=Courier New, monospace;Georgia=Georgia, Palatino, serif;Helvetica=Helvetica, Arial, sans-serif;Impact=Impact, Charcoal, sans-serif;Symbol=Symbol;Tahoma=Tahoma, Arial, sans-serif;Terminal=Terminal, Monaco, monospace;Times New Roman=Times New Roman, Times, serif;Trebuchet MS=Trebuchet MS, Helvetica, sans-serif;Verdana=Verdana, Geneva, sans-serif;Webdings=Webdings;Wingdings=Wingdings, Zapf Dingbats"
+                        }}
+                    />
+                </div>
 
 
-            {/* Preview */}
-            {/* <div className="w-1/3 bg-gray-50 p-4 overflow-auto">
+                {/* Preview */}
+                {/* <div className="w-1/3 bg-gray-50 p-4 overflow-auto">
                 <h2 className="font-bold mb-4">Preview</h2>
                 <div className="preview-container" dangerouslySetInnerHTML={{ __html: content }} />
             </div> */}
-            <div className="flex items-end justify-end p-6 rounded-b">
-                <button className="btn bg-green-500 mr-2 w-1/6" type="button" onClick={() => saveOn(content)}>
-                    บันทึก
-                </button>
-            </div>
-        </div >
-
+                <div className="flex items-end justify-end p-6 rounded-b">
+                    <button className="btn bg-green-500 mr-2 w-1/6" type="button" onClick={() => saveOn()}>
+                        บันทึก
+                    </button>
+                </div>
+            </div >
+        </>
     );
 };
 

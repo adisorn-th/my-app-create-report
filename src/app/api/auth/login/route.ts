@@ -1,59 +1,62 @@
-import { NextRequest } from "next/server";
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { NextRequest, NextResponse } from "next/server";
+//import { prisma } from "@/lib/prisma"; // Ensure Prisma is properly initialized
 import bcrypt from "bcryptjs";
-//import jwt from 'jsonwebtoken';
-var jwt = require("jsonwebtoken");
-// export async function POST(req: NextRequest) {
-//     const { email, password } = await req.json();
+import jwt from "jsonwebtoken";
+import { PrismaClient } from '@prisma/client'
 
-//     if (email === "test@example.com" && password === "password") {
-//         return NextResponse.json({ success: true, token: "fake-token" });
-//     } else {
-//         return NextResponse.json({ success: false, error: "Invalid credentials" }, { status: 401 });
-//     }
-// }
+const prisma = new PrismaClient()
+
+const SECRET_KEY = process.env.JWT_SECRET as string;
+
 export async function POST(req: NextRequest) {
     try {
-        const db = await open({
-            filename: 'mydb.sqlite',
-            driver: sqlite3.Database
-        });
         const body = await req.json(); // Parse request body
-        if (body.username) {
-            const row = await db.get('SELECT * FROM user WHERE email = ?', [body.username]);
-            if (!row) {
-                return Response.json(({ success: false, error: "User not found" }), {
-                    status: 404,
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            }
-            var passwordIsValid = bcrypt.compareSync(
-                body.password,
-                row.password
-            );
-            if (!passwordIsValid) {
-                return Response.json(({ success: false, error: "Invalid Password!" }), {
-                    status: 401,
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            }
-            var token = jwt.sign({ id: row.id }, 'bakpob', {
-                expiresIn: 86400 * 90 // 24 hours
-            });
 
-            delete row.password
-            row.token = token;
-            return Response.json(({ success: true, users: row }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
-            });
+        if (!body.username || !body.password) {
+            return NextResponse.json(
+                { success: false, error: "Username and password are required" },
+                { status: 400 }
+            );
         }
-    }
-    catch {
-        return Response.json(({ success: false, error: "User not found" }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' }
+
+        // Find user by email
+        const user = await prisma.users.findUnique({
+            where: { email: body.username }
         });
+
+        if (!user) {
+            return NextResponse.json(
+                { success: false, error: "User not found" },
+                { status: 404 }
+            );
+        }
+
+        // Validate password
+        const passwordIsValid = bcrypt.compareSync(body.password, user.password);
+        if (!passwordIsValid) {
+            return NextResponse.json(
+                { success: false, error: "Invalid password!" },
+                { status: 401 }
+            );
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user.id }, SECRET_KEY, {
+            expiresIn: 86400 * 90 // 90 days
+        });
+
+        // Remove password from response
+        const { password, ...userWithoutPassword } = user;
+
+        return NextResponse.json(
+            { success: true, user: { ...userWithoutPassword, token } },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Login Error:", error);
+        return NextResponse.json(
+            { success: false, error: "Internal server error" },
+            { status: 500 }
+        );
     }
-};
+}

@@ -18,7 +18,7 @@ export default function LoginForm() {
 
         const data = await res.json();
         if (data.success) {
-            localStorage.setItem('user', JSON.stringify({ users: data.users }))
+            localStorage.setItem('user', JSON.stringify({ users: data.user }))
             router.push("/");
         } else {
             alert("Login failed");
