@@ -53,12 +53,11 @@ const PostsPage = () => {
     <Navbar />
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6">Posts</h1>
-      <table className="min-w-full table-auto border-collapse">
+      {/* <table className="min-w-full table-auto border-collapse">
         <thead>
           <tr className="bg-gray-200">
             <th className="py-2 px-4 border-b">ID</th>
             <th className="py-2 px-4 border-b">Title</th>
-            {/* <th className="py-2 px-4 border-b">Content</th> */}
             <th className="py-2 px-4 border-b">Created At</th>
             <th className="py-2 px-4 border-b">User</th>
             <th className="py-2 px-4 border-b">Action</th>
@@ -69,11 +68,9 @@ const PostsPage = () => {
             <tr key={post.id} className="hover:bg-gray-100">
               <td className="py-2 px-4 border-b">{post.id}</td>
               <td className="py-2 px-4 border-b">{post.title}</td>
-              {/* <td className="py-2 px-4 border-b">{post.content ?? "No content"}</td> */}
               <td className="py-2 px-4 border-b">{new Date(post.createdAt).toLocaleDateString()}</td>
               <td className="py-2 px-4 border-b">{post.user.name}</td>
               <td className="py-2 px-4 border-b">
-                {/* ปุ่ม Action */}
                 <button
                   className="text-blue-500 hover:text-blue-700"
                   onClick={() => handleShowContent(post.content)}
@@ -84,7 +81,44 @@ const PostsPage = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
+
+      <div className="flex flex-col">
+        <div className="-m-1.5 overflow-x-auto">
+          <div className="p-1.5 min-w-full inline-block align-middle">
+            <div className="border rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">ID</th>
+                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Title</th>
+                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Created At</th>
+                    <th scope="col" className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">User</th>
+                    <th scope="col" className="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {posts.map((post) => (
+                    <tr key={post.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{post.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{post.title}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{new Date(post.createdAt).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{post.user.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
+                        <button type="button" className="inline-flex items-center gap-x-2 text-sm font-semibold 
+                        rounded-lg border border-transparent text-blue-600 hover:text-blue-800 
+                        focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none" onClick={() => handleShowContent(post.content)}>Detail</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       {/* แสดงผลใน input */}
       <div className="mt-6">
         <Editor
@@ -116,12 +150,12 @@ const PostsPage = () => {
       </div>
     </div>
     <Select options={options} isMulti
-    name="colors"
-    className="basic-multi-select"
-    classNamePrefix="select" />
+      name="colors"
+      className="basic-multi-select"
+      classNamePrefix="select" />
     <div className="flex items-end justify-end p-6 rounded-b">
       <button className="btn bg-green-400 mr-2 w-1/6" type="button">
-        Send To 
+        Send To
       </button>
     </div>
   </>

@@ -314,7 +314,7 @@ const TemplateEditor: React.FC = () => {
     // };
 
     const saveOn = async () => {
-        
+
         if (!posts || posts.content === "") {
             Swal.fire("กรุณากรอกข้อมูลให้ครบ", "", "info");
             return;
@@ -362,54 +362,6 @@ const TemplateEditor: React.FC = () => {
     return (
         <>
             <div className="flex h-screen p-4">
-
-                {/* Sidebar - Variables */}
-                <div className="w-64 bg-gray-100 p-4">
-
-                    {/* <h1 className="text-xl font-bold">Health Records</h1>
-                <div className="w-64 bg-gray-100 p-4 mt-4">
-                    <h2 className="font-bold mb-4">Variables</h2>
-                    <input
-                        type="text"
-                        placeholder="Search variables..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full p-2 mb-2 border rounded"
-                    />
-
-                    {filteredData.map((variable) => (
-                        <div
-                            key={variable.id}
-                            draggable
-                            onDragStart={(e) => e.dataTransfer.setData("text/plain", variable.value)}
-                            className="bg-white p-2 mb-2 rounded cursor-move hover:bg-gray-50"
-                        >
-                            {variable.label}
-                        </div>
-                    ))}
-                </div> */}
-
-                    {/* <h2 className="font-bold mb-4">Variables</h2>
-                {data.map((variable) => (
-                    <div
-                        key={variable.id}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, variable.value)}
-                        className="bg-white p-2 mb-2 rounded cursor-move hover:bg-gray-50"
-                    >
-                        {variable.label}
-                    </div>
-                ))} */}
-                    {/* ปุ่มอัปโหลดไฟล์ */}
-                    <input type="file" accept=".docx" onChange={handleFileUpload} className="mb-2" />
-                    <button onClick={exportToWord} className="bg-blue-500 text-white p-2 rounded mt-4 w-full">
-                        Export to Word
-                    </button>
-                    <button onClick={exportToPDF} className="bg-green-500 text-white p-2 rounded mt-4 w-full">
-                        Export to PDF
-                    </button>
-                </div>
-
                 <div className="flex-1 flex flex-col p-4 w-full"
                     onDrop={handleDrop}
                     onDragOver={(e) => e.preventDefault()}
@@ -421,6 +373,24 @@ const TemplateEditor: React.FC = () => {
                         value={posts?.title}
                         onChange={(e) => setPosts(prevPosts => ({ ...prevPosts, title: e.target.value }))}
                     />
+                    <div className="max-w-sm">
+                        <form>
+                            <label className="block">
+                                <span className="sr-only">Choose profile photo</span>
+                                <input type="file" accept=".docx" className="block w-full text-sm text-gray-500
+        file:me-4 file:py-2 file:px-4
+        file:rounded-lg file:border-0
+        file:text-sm file:font-semibold
+        file:bg-blue-600 file:text-white
+        hover:file:bg-blue-700
+        file:disabled:opacity-50 file:disabled:pointer-events-none
+        dark:text-neutral-500
+        dark:file:bg-blue-500
+        dark:hover:file:bg-blue-400
+      " onChange={handleFileUpload} />
+                            </label>
+                        </form>
+                    </div>
                     <Editor
                         apiKey="h9a0m7tta88e3l9u3s68t4zvqcs5yz69wrl9umkrkbh2hba6"
                         onInit={(evt, editor) => (editorRef.current = editor)}
@@ -452,15 +422,15 @@ const TemplateEditor: React.FC = () => {
 
                 {/* Preview */}
                 {/* <div className="w-1/3 bg-gray-50 p-4 overflow-auto">
-                <h2 className="font-bold mb-4">Preview</h2>
-                <div className="preview-container" dangerouslySetInnerHTML={{ __html: content }} />
-            </div> */}
+                    <h2 className="font-bold mb-4">Preview</h2>
+                    <div className="preview-container" dangerouslySetInnerHTML={{ __html: content }} />
+                </div> */}
                 <div className="flex items-end justify-end p-6 rounded-b">
                     <button className="btn bg-green-500 mr-2 w-1/6" type="button" onClick={() => saveOn()}>
                         บันทึก
                     </button>
                 </div>
-            </div >
+                </div>
         </>
     );
 };
