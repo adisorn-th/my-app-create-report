@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import dynamic from "next/dynamic";
 const Editor = dynamic(() => import("@tinymce/tinymce-react").then((mod) => mod.Editor), { ssr: false });
 import { useEffect, useState } from "react";
-import Select from 'react-select'
+// import Select from 'react-select'
 
 interface Post {
   id: number;
@@ -149,10 +149,11 @@ const PostsPage = () => {
         />
       </div>
     </div>
-    <Select options={options} isMulti
+   {/* <Select options={options} isMulti
       name="colors"
       className="basic-multi-select"
-      classNamePrefix="select" />
+      classNamePrefix="select" />*/}
+
     <div className="flex items-end justify-end p-6 rounded-b">
       <button className="btn bg-green-400 mr-2 w-1/6" type="button">
         Send To
